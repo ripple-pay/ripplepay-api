@@ -1,0 +1,85 @@
+{% load static tailwind_tags %}
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		{% tailwind_css %}
+	</head>
+	<body>
+		<div
+			class="flex flex-col gap-4 justify-center items-center h-screen w-full bg-gray-300"
+		>
+			<div class="flex justify-center mx-auto items-center">
+				<p class="tracking-[15px] text-indigo-600 text-[30px] italic">
+					Ripple
+				</p>
+				<span class="italic tracking-[10px] text-red-700 text-[30px]"
+					>Pay</span
+				>
+			</div>
+
+			<div
+				class="items-center mx-auto h-[250px] w-[500px] bg-white shadow-lg rounded-lg py-2"
+			>
+				<div class="flex justify-between my-3 mx-4">
+					<p class="italic">Business name</p>
+					<p class="text-[13px]">Payment Details</p>
+				</div>
+				<div
+					class="flex justify-center items-center bg-black text-white h-[50px] w-[200px] mx-auto rounded-lg"
+				>
+					<p>
+						<span class="text-[13px] mb-5">$</span>100 = 240 Xrp
+						Token
+					</p>
+				</div>
+				<div class="flex justify-center mx-auto my-2">
+					<p class="text-[13px]">
+						Make the transfer of 240 xrp token to the address below
+					</p>
+				</div>
+				<div class="flex justify-center mx-auto my-2">
+					<p class="text-[13px]">
+						Address:
+						<span class="font-bold text-[12px]"
+							>rwDJ3sxq3eMZRrGgDKGQcV26JyfhAuky8b</span
+						>
+					</p>
+				</div>
+				<div class="mx-4 my-2">
+					<button
+						type="submit"
+						class="inline-block bg-indigo-500 py-3 w-full rounded-lg text-[12px] text-white my-2"
+					>
+						Verify payment
+					</button>
+				</div>
+			</div>
+		</div>
+		<!-- Your HTML template -->
+		<button id="myButton">Click Me</button>
+
+		<script>
+			let url = 'ws://' + window.location.host + '/ws/transactions';
+			window.onload = function () {
+				connectSocket();
+			};
+			// Your JavaScript code
+
+			const socket = new WebSocket(url);
+
+			const connectSocket = () => {
+				socket.onopen = () => {
+					console.log('WebSocket connection established');
+					socket.send('Run the async task');
+				};
+			
+			};
+
+			socket.onmessage = (event) => {
+				console.log('Received:', event.data);
+			};
+		</script>
+	</body>
+</html>
