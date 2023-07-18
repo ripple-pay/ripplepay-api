@@ -15,12 +15,8 @@ import os
 import asyncio
 from dotenv import load_dotenv
 from django.http import HttpResponse
-from asgiref.sync import sync_to_async
-from concurrent.futures import ThreadPoolExecutor
-# from .consumers import main
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
-import concurrent.futures
+from utils.xrp_price import get_xrp_price
+import math
 
 
 load_dotenv()
@@ -41,27 +37,30 @@ class InitializePaymentViewSet(APIView):
         api_key = request.headers['api_key']
         data = request.data
         try:
-            
-            business = User.objects.get(api_key=api_key)
-            wallet = generate_faucet_wallet(xrp_client, debug=True)
-            transaction_ref = data['transaction_reference']
-            xrp_amount = 1000
-            transaction_model = InitializePaymentModel.objects.create(
-                business= business,
-                wallet_address= wallet['classic_address'],
-                wallet_public_key = wallet['public_key'],
-                wallet_private_key = wallet['private_key'],
-                amount= data['amount'],
-                transaction_reference = transaction_ref,
-                xrp_amount = xrp_amount
-                ) 
-            serializer = self.serializer_class(transaction_model)
-            serializer['redirect_url'] = data['redirect_url']
-            serializer['xrp_amount'] = xrp_amount
-            serializer['business_name'] = business.business_name
-            serializer['business_id'] = business.business_id
-            serializer['payment_link'] = f"{backend_domain}/{transaction_ref}"
-            return Response(data={"message":"success", "data": serializer.data}, status=status.HTTP_200_OK)          
+            xrp_price = get_xrp_price() #Get xrp token price 
+            if xrp_price['status']:
+                business = User.objects.get(api_key=api_key)
+                wallet = generate_faucet_wallet(xrp_client, debug=True)
+                
+                transaction_ref = data['transaction_reference']
+                xrp_amount = math.ceil((float(data['amount']) / float(xrp_price['price']))* 100)/100 # Get the xrp equivalence of amount to be paid, round to 2 d.p
+                transaction_model = InitializePaymentModel.objects.create(
+                    business= business,
+                    wallet_address= wallet['classic_address'],
+                    wallet_public_key = wallet['public_key'],
+                    wallet_private_key = wallet['private_key'],
+                    amount= data['amount'],
+                    transaction_reference = transaction_ref,
+                    xrp_amount = xrp_amount
+                    ) 
+                serializer = self.serializer_class(transaction_model)
+                serializer['redirect_url'] = data['redirect_url']
+                serializer['xrp_amount'] = xrp_amount
+                serializer['business_name'] = business.business_name
+                serializer['business_id'] = business.business_id
+                serializer['payment_link'] = f"{backend_domain}/transactions/tx-ref={transaction_ref}"
+                return Response(data={"message":"success", "data": serializer.data}, status=status.HTTP_200_OK)   
+            return Response(data={"message": "failed"}, status=status.HTTP_400_BAD_REQUEST)       
         except Exception as e:
             return Response(data={"message": "failed"}, status=status.HTTP_400_BAD_REQUEST)
     
@@ -72,8 +71,8 @@ initialize_payment = InitializePaymentViewSet.as_view()
             
 
 def transactionsview(request, ref):
-   
- 
-    
-  
     return render(request, 'transactions/transactions.html', {})
+# 
+
+def custom_page_not_found(request, exception):
+    return render(request, 'transactions/404.html', status=404)

@@ -58,7 +58,6 @@
 			</div>
 		</div>
 		<!-- Your HTML template -->
-		<button id="myButton">Click Me</button>
 
 		<script>
 			let url = 'ws://' + window.location.host + '/ws/transactions';
@@ -74,7 +73,6 @@
 					console.log('WebSocket connection established');
 					socket.send('Run the async task');
 				};
-			
 			};
 
 			socket.onmessage = (event) => {

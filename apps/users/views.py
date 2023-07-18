@@ -4,14 +4,17 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from .serializers import (RegisterBusinessSerializer)
-from utils.utils import generate_business_id
+from utils.id_generators import businessIDGenerator, apiKeyGenerator
 from utils.xrpl_connect import xrpl_connection
 from xrpl.wallet import generate_faucet_wallet
 from xrpl.models.requests.account_info import AccountInfo
 from xrpl.account import get_balance
 from .models import User
+from datetime import date
+from dateutil.relativedelta import relativedelta
 
 xrp_client = xrpl_connection()
+three_months = date.today() + relativedelta(months=+3)
 
 
 
@@ -22,7 +25,8 @@ class RegisterBusiness(APIView):
 
     def post(self,request):
         data = request.data
-        business_id = generate_business_id()
+        business_id = businessIDGenerator()
+        api_key = apiKeyGenerator()
         try:
             #Make all fields required in the frontend 
             serializer = self.serializer_class(data=data)
@@ -34,6 +38,8 @@ class RegisterBusiness(APIView):
                 user.classic_address = wallet.classic_address
                 user.private_key = wallet.private_key
                 user.public_key = wallet.public_key
+                user.api_key = api_key
+                user.api_key_expiration = three_months
                 user.save()   
                 # serialized_data = self.serializer_class(saved_user)
                 

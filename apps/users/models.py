@@ -18,6 +18,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     business_name = models.CharField(max_length=120, unique=True, blank=True, null=True)
     business_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
     api_key = models.CharField(max_length=255, unique=True, blank=True, null=True)
+    api_key_expiration = models.DateField(blank=True, null=True)
     webhook = models.CharField(max_length=255, unique=True, blank=True, null=True)
     private_key = models.CharField(max_length=255, unique=True, blank=True, null=True)
     public_key= models.CharField(max_length=255, unique=True, blank=True, null=True)
