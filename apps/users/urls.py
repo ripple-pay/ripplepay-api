@@ -8,7 +8,8 @@ from .views import *
 urlpatterns = [
   
     path('register-business', business, name="register-business"),
-    path('business', business, name="business-info"),
+    path('balance-customers-count', balance_customer_count, name="balance-customers-count"),
+    path('login', login_view, name="login"),
   
     
     

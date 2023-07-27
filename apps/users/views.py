@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 # Create your views here.
 from rest_framework import status
 from rest_framework.response import Response
-from .serializers import (RegisterBusinessSerializer)
+from .serializers import (LoginSerializer, RegisterBusinessSerializer)
 from utils.id_generators import businessIDGenerator, apiKeyGenerator
 from utils.xrpl_connect import xrpl_connection
 from xrpl.wallet import generate_faucet_wallet
@@ -12,12 +12,42 @@ from xrpl.account import get_balance
 from .models import User
 from datetime import date
 from dateutil.relativedelta import relativedelta
+from xrpl.wallet import Wallet
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken
+from apps.transactions.models import TransactionsModel
+
 
 xrp_client = xrpl_connection()
 three_months = date.today() + relativedelta(months=+3)
 
+class LoginView(APIView):
+    serializer_class = LoginSerializer
 
+    def post(self,request):
+        try:
+            data = request.data
+            email = data['email']
+            password = data['password']
+            user = User.objects.get(email= email)
+        
+            refresh = RefreshToken.for_user(user)
+            raw_token = str(refresh.access_token)   
+         
+            if user is None:
+                raise AuthenticationFailed(detail="User Not Found ")
+            if not user.check_password(password):
+                raise AuthenticationFailed(detail="Password is Incorrect")
+            serializer = self.serializer_class(user, context= {'request': request})
+            return Response(data ={"data":serializer.data,"refresh": str(refresh), "access": raw_token}, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(e, "+====================")
+            # logger.info(f"Error occured during log in, {e}")
+            return Response(data={"message": "Failure occurred during log in"}, status=status.HTTP_400_BAD_REQUEST)
+        
 
+login_view = LoginView.as_view()
 
 
 class RegisterBusiness(APIView):
@@ -32,6 +62,7 @@ class RegisterBusiness(APIView):
             serializer = self.serializer_class(data=data)
             if serializer.is_valid():
                 wallet = generate_faucet_wallet(xrp_client, debug=True)
+              
                 user = serializer.save()  
                 user.set_password(data['password'])
                 user.business_id = business_id
@@ -49,17 +80,27 @@ class RegisterBusiness(APIView):
             print(e,"+++++++++++++++")
             # logging.info(f"Error occured during signup : {e}")
             return Response(data={"message": "Error occured during signup"}, status=status.HTTP_400_BAD_REQUEST)
-    
-    def get(self,request):
-        try:
-            user = User.objects.get(email=request.user)
-            balance = get_balance(address=user.classic_address, client=xrp_client, ledger_index="validated")
-            serializer = self.serializer_class(user)
-            serializer['balance'] = balance
-            return Response(data={"message":"success", "data": serializer.data}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response(data={"message":"failed", "data": "Failed process"}, status=status.HTTP_400_BAD_REQUEST)
-        
           
         
 business = RegisterBusiness.as_view()
+
+class GetBalanceAndCustomersCountAPIView(APIView):
+        permission_classes = [IsAuthenticated]
+        def get(self,request):
+            data ={}
+            try:
+                user = User.objects.get(email=request.user)
+                balance = get_balance(address=user.classic_address, client=xrp_client, ledger_index="validated")
+                # customers = TransactionsModel.objects.distinct('customers_email').count() // Worrks for postgresql db not mysql
+                
+                data['balance'] = balance
+                # data['customer_count'] = customers
+                return Response(data={"message":"success", "data": data}, status=status.HTTP_200_OK)
+            except Exception as e:
+                print(e, "EEEEEEEEEEEEE")
+                return Response(data={"message":"failed", "data": "Failed process"}, status=status.HTTP_400_BAD_REQUEST)
+
+balance_customer_count = GetBalanceAndCustomersCountAPIView.as_view()
+    
+            
+

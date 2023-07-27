@@ -12,9 +12,13 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 import os
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+from dotenv import load_dotenv
+load_dotenv()
+
 
 
 
@@ -26,7 +30,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-j#q$x02z(3&t+3u9l28u2j+#_r42wh+hpa8)d=snyps4ltn8d1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -43,7 +47,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
     #Apps
     'apps.users',
     'apps.transactions',
@@ -52,12 +55,17 @@ INSTALLED_APPS = [
     #Tailwind
     'tailwind',
     'theme',
-    'django_browser_reload'
-
+    'django_browser_reload',
+    #rest_frame_wwork,
+    "rest_framework",
+    "corsheaders",
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
 
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -100,6 +108,25 @@ CHANNEL_LAYERS = {
         },
     },
 }
+# CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True 
+CORS_ORIGIN_WHITELIST = (
+    "http://localhost:8000",
+    "http://localhost:3001",
+    "http://192.168.201.210:8000"
+
+    
+)
+
+CSRF_TRUSTED_ORIGINS = [
+
+     "http://localhost:3001",
+     "http://localhost:8000",
+    "http://192.168.201.210:8000"
+ 
+   
+
+]
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
@@ -130,6 +157,26 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+}
+
+
+
+SIMPLE_JWT = {
+    "AUTH_HEADER_TYPES": (
+        "Bearer",
+        "JWT",
+    ),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "SIGNING_KEY": os.environ.get("SIGNING_KEY"),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/

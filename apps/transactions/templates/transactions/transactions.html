@@ -71,7 +71,8 @@
 			const connectSocket = () => {
 				socket.onopen = () => {
 					console.log('WebSocket connection established');
-					socket.send('Run the async task');
+					const reference = window.location.pathname.split('/')[4];
+					socket.send(reference);
 				};
 			};
 
