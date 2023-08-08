@@ -9,7 +9,6 @@ from utils.convert_to_sable_coin import create_offer
 import json
 from asgiref.sync import sync_to_async
 from xrpl.wallet import Wallet
-
 from xrpl.models.requests.account_info import AccountInfo
 from utils.xrpl_connect import xrpl_connection
 from xrpl.account import get_balance
@@ -38,7 +37,7 @@ async def api_request(options, websocket):
         return json.loads(message)
     except Exception as e:
         return e
-
+#Subscribe and listen wto when a payment is made to your wallet address
 async def do_subscribe(wallet_address, websocket):
     print(wallet_address, "This is wallet")
     command = await api_request({
@@ -47,14 +46,12 @@ async def do_subscribe(wallet_address, websocket):
         }, websocket)
     if command['status'] == 'success':
             print('Successfully Subscribed!')
-    else:
-        pass
     data = await handler(websocket)
     datum = json.loads(data)
     #Check if the address that received the payment is the address we subscribed to
     if(datum['transaction']['Destination']== str(wallet_address) and datum['transaction']['TransactionType'] == "Payment"):
-        print("hii")
-        funds_transfer_instance = await funds_transfer(wallet_address) #Transfer the funds from generated adddress to base address
+        print("hii", datum['transaction']['Amount'],":::::::::::::::::", datum['transaction']['Account'])
+        # funds_transfer_instance = await funds_transfer(wallet_address) #Transfer the funds from generated adddress to base address
     else:
         pass
 

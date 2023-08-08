@@ -2,8 +2,6 @@
 import requests
 import os
 from dotenv import load_dotenv
-
-
 load_dotenv()
 
 
@@ -16,5 +14,5 @@ def get_xrp_price():
     return {"status": False}
   
     
-   
+
     

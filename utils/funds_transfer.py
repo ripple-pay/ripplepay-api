@@ -6,7 +6,6 @@ from xrpl.models.transactions import Payment
 from xrpl.utils import xrp_to_drops
 from xrpl.transaction import autofill_and_sign, submit_and_wait, submit
 from asgiref.sync import sync_to_async
-from xrpl.wallet import Wallet
 from xrpl.wallet import generate_faucet_wallet, Wallet
 from .convert_to_sable_coin import create_offer
 

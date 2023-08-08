@@ -17,10 +17,16 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from apps.transactions.models import TransactionsModel
+from utils.add_trustline import create_trust_line
+from dotenv import load_dotenv
+from xrpl.models.requests import AccountLines
+import os
+load_dotenv()
 
 
 xrp_client = xrpl_connection()
 three_months = date.today() + relativedelta(months=+3)
+seed =  generate_faucet_wallet(xrp_client).seed
 
 class LoginView(APIView):
     serializer_class = LoginSerializer
@@ -91,16 +97,57 @@ class GetBalanceAndCustomersCountAPIView(APIView):
             try:
                 user = User.objects.get(email=request.user)
                 balance = get_balance(address=user.classic_address, client=xrp_client, ledger_index="validated")
+                account_lines_request = AccountLines(account=user.classic_address)
+
+                # Send the request to the XRP Ledger
+                response = xrp_client.request(account_lines_request)
+
+                # Extract and display the trustlines
+                trustlines = response.result["lines"]
+                for trustline in trustlines:
+                    if trustline['currency'] == "JPY":
+                        data['jpy'] =  trustline['balance']
+                    if trustline['currency'] == "EUR":
+                        data['eur'] =  trustline['balance']
+                    if trustline['currency'] == "USD":
+                        data['usd'] =  trustline['balance']
+                    if trustline['currency'] == "NGN":
+                        data['ngn'] =  trustline['balance']
+                    
                 # customers = TransactionsModel.objects.distinct('customers_email').count() // Worrks for postgresql db not mysql
                 
                 data['balance'] = balance
                 # data['customer_count'] = customers
+                print("data:::::::::::::", data)
                 return Response(data={"message":"success", "data": data}, status=status.HTTP_200_OK)
             except Exception as e:
                 print(e, "EEEEEEEEEEEEE")
                 return Response(data={"message":"failed", "data": "Failed process"}, status=status.HTTP_400_BAD_REQUEST)
 
 balance_customer_count = GetBalanceAndCustomersCountAPIView.as_view()
+
+
+class ActivateAccount(APIView):
+    "Activating account, allows the user to add trustlines like EUR, USD, JPY and NGN"
+    permission_classes =[IsAuthenticated]
+    def patch(self, request):
+        currencies = ["EUR", "USD", "JPY", "NGN"]
+        account = User.objects.get(email=request.user)
+        try:
+            for currency in currencies:
+                trustline_reply = create_trust_line(private_key=account.private_key,public_key=account.public_key, seed=seed,issuer=os.getenv('ISSUER'),currency= currency,amount= 1000000000) # amount is  1 *10**9
+            print(trustline_reply)
+            account.account_activated = True
+            account.save()
+            return Response({}, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(e, "Account activation error")
+            return Response({"Error": {e}}, status=status.HTTP_400_BAD_REQUEST)
+
+activate_account = ActivateAccount.as_view()
+        
+        
+        
     
             
 

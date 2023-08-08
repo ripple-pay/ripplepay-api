@@ -26,6 +26,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     xrp_balance =  models.CharField(max_length=255, unique=True, blank=True, null=True)
     is_administrator = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
+    account_activated = models.BooleanField(default=False)
    
   
     USERNAME_FIELD = "email"

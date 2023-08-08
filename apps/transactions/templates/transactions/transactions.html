@@ -3,60 +3,86 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Document</title>
+		<title>Payment</title>
 		{% tailwind_css %}
 	</head>
 	<body>
 		<div
-			class="flex flex-col gap-4 justify-center items-center h-screen w-full bg-gray-300"
+			class="flex flex-col justify-center items-center h-screen w-full bg-gray-200"
 		>
 			<div class="flex justify-center mx-auto items-center">
-				<p class="tracking-[15px] text-indigo-600 text-[30px] italic">
+				<p class="tracking-[6px] text-indigo-600 text-[20px] italic">
 					Ripple
 				</p>
-				<span class="italic tracking-[10px] text-red-700 text-[30px]"
+				<span class="italic tracking-[6px] text-red-700 text-[20px]"
 					>Pay</span
 				>
 			</div>
 
 			<div
-				class="items-center mx-auto h-[250px] w-[500px] bg-white shadow-lg rounded-lg py-2"
+				class="items-center mx-auto h-screen/2 w-[300px] bg-white shadow-lg rounded-lg py-2"
 			>
-				<div class="flex justify-between my-3 mx-4">
-					<p class="italic">Business name</p>
-					<p class="text-[13px]">Payment Details</p>
+				<div class="justify-between my-1 mx-4">
+					<p class="italic">XYZ Business</p>
 				</div>
+
 				<div
-					class="flex justify-center items-center bg-black text-white h-[50px] w-[200px] mx-auto rounded-lg"
+					class="flex px-4 justify-center mx-auto my-2 bg-neutral-200"
 				>
-					<p>
-						<span class="text-[13px] mb-5">$</span>100 = 240 Xrp
-						Token
+					<p class="text-[13px] mx-auto">
+						Please Ensure you verify payment after making transfer
+						from your wallet
 					</p>
 				</div>
-				<div class="flex justify-center mx-auto my-2">
-					<p class="text-[13px]">
-						Make the transfer of 240 xrp token to the address below
-					</p>
+				<div class="flex flex-col px-4 justify-center mx-auto my-2">
+					<div class="flex justify-between">
+						<p class="text-[13px] font-light">NGN:14,000</p>
+						<p class="text-[13px] font-light">JPY: 4585</p>
+					</div>
+					<div class="flex justify-between">
+						<p class="text-[13px] font-light">USD: 300</p>
+						<p class="text-[13px] font-light">EUR: 256</p>
+					</div>
 				</div>
-				<div class="flex justify-center mx-auto my-2">
-					<p class="text-[13px]">
-						Address:
-						<span class="font-bold text-[12px]"
-							>rwDJ3sxq3eMZRrGgDKGQcV26JyfhAuky8b</span
-						>
+				<div class="flex flex-col justify-center mx-auto my-2">
+					<p class="text-[13px] my-2 mx-auto">
+						Copy the payment address
 					</p>
+					<input
+						type="text"
+						value="rwDJ3sxq3eMZRrGgDKGQcV26JyfhAuky8b"
+						disabled
+						class="mx-4 text-[12px] border border-s-purple-900"
+					/>
 				</div>
+				<!-- <div class="w-3/4 mx-4">
+					<p class="text-[12px] my-2">
+						Select the currency you made payment with
+					</p>
+					<select name="" id="" class="w-full mx-3">
+						<option value="">JPY</option>
+						<option value="">USD</option>
+						<option value="">EUR</option>
+						<option value="">NGN</option>
+					</select>
+				</div>
+				<div class="w-3/4 mx-4">
+					<p class="text-[12px] my-2">
+						Enter xrp wallet you made payment with
+					</p>
+					<input type="text" class="mx-5" />
+				</div> -->
 				<div class="mx-4 my-2">
 					<button
 						type="submit"
-						class="inline-block bg-indigo-500 py-3 w-full rounded-lg text-[12px] text-white my-2"
+						class="inline-block bg-indigo-500 py-3 w-full rounded-sm text-[12px] text-white my-2"
 					>
 						Verify payment
 					</button>
 				</div>
 			</div>
 		</div>
+
 		<!-- Your HTML template -->
 
 		<script>
