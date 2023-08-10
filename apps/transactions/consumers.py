@@ -51,7 +51,14 @@ async def do_subscribe(wallet_address, websocket):
     #Check if the address that received the payment is the address we subscribed to
     if(datum['transaction']['Destination']== str(wallet_address) and datum['transaction']['TransactionType'] == "Payment"):
         print("hii", datum['transaction']['Amount'],":::::::::::::::::", datum['transaction']['Account'])
-        # funds_transfer_instance = await funds_transfer(wallet_address) #Transfer the funds from generated adddress to base address
+        if(type(datum['transaction']['Amount']) != str):
+            transaction_details = datum['transaction']['Amount']
+            transaction_details['account'] = datum['transaction']['Account']
+            print("TRANSACTION_DETAILS", transaction_details)
+            
+            funds_transfer_instance = await funds_transfer(wallet_address, transaction_details) #Transfer the funds from generated adddress to base address
+        else:
+            funds_transfer_instance = await funds_transfer(wallet_address, "") #Transfer the funds from generated adddress to base address
     else:
         pass
 

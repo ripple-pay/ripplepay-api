@@ -13,7 +13,7 @@ import os
 from rest_framework.permissions import IsAuthenticated
 from dotenv import load_dotenv
 from django.http import HttpResponse
-from utils.xrp_price import get_xrp_price
+from utils.xrp_price import get_usd_eur, get_xrp_price
 import math
 import json
 from .models import TransactionsModel
@@ -48,6 +48,7 @@ class InitializePaymentViewSet(APIView):
                 business = User.objects.get(api_key=api_key)
                 print(business.email, business.api_key)
                 wallet = generate_faucet_wallet(xrp_client, debug=True)
+                eur_jpy_response = get_usd_eur(data['amount'])
                 for currency in currencies:
                     trustline = create_trust_line(private_key=wallet.private_key, public_key=wallet.public_key, seed=seed, issuer=os.getenv('ISSUER'), currency=currency, amount=1000000000) # Amount = 1*10*9
                 transaction_ref = data['transaction_reference']
@@ -60,7 +61,9 @@ class InitializePaymentViewSet(APIView):
                     amount= data['amount'],
                     transaction_reference = transaction_ref,
                     customers_email = data['customers_email'],
-                    xrp_amount = xrp_amount
+                    xrp_amount = xrp_amount,
+                    eur = round(eur_jpy_response['EUR'], 2),
+                    jpy = round(eur_jpy_response['JPY'],2)
                     ) 
         
                 serializer = self.serializer_class(transaction_model)
@@ -74,7 +77,6 @@ class InitializePaymentViewSet(APIView):
                 return Response(data={"message":"success", "data": serialized_data}, status=status.HTTP_200_OK)   
             return Response(data={"message": "failed"}, status=status.HTTP_400_BAD_REQUEST)       
         except Exception as e:
-            print(e, "ERRRRRRRRRRRRRRRRPR")
             return Response(data={"message": "failed"}, status=status.HTTP_400_BAD_REQUEST)
     
 initialize_payment = InitializePaymentViewSet.as_view()
@@ -97,8 +99,16 @@ class TransactionsView(APIView):
     def post(self, request):
         data = request.data
         res = {}
+        payment =""
         business = User.objects.filter(email=request.user).first()
-        payment = Payment(account=business.classic_address, amount=xrp_to_drops(int(data['amount'])), destination=data['address'])  #Remove 10XRP Balance from amount to be transfered
+        if data['currency'] == "XRP":
+            payment = Payment(account=business.classic_address, amount=xrp_to_drops(float(data['amount'])), destination=data['address'])  #Remove 10XRP Balance from amount to be transfered
+        else:
+            payment = Payment(account=business.classic_address,   amount= {
+                        "currency":data['currency'],
+                        "issuer":os.getenv('ISSUER'),
+                        "value":data['amount']
+                    }, destination=data['address'])  #Remove 10XRP Balance from amount to be transfered
         wallet = Wallet(business.public_key, business.private_key, seed=seed)
         #Sign transactions
         signed_tx = autofill_and_sign(payment, xrp_client, wallet)
@@ -109,7 +119,7 @@ class TransactionsView(APIView):
                 res['destination_adresss'] = data['address']
                 res['source_address'] = business.classic_address
                 res['date'] = datetime.today()
-                WithdrawalModel.objects.create(business=business, address = data['address'], amount=data['amount'])
+                WithdrawalModel.objects.create(business=business, address = data['address'], amount=data['amount'], currency=data['currency'])
 
                 return Response({"message":"success","data":res }, status=status.HTTP_200_OK)
         except Exception as e:
@@ -123,7 +133,15 @@ transactions = TransactionsView.as_view()
                 
 
 def transactionsview(request, ref):
-    return render(request, 'transactions/transactions.html', {})
+    initialize_payment_instance = InitializePaymentModel.objects.filter(transaction_reference=ref).first()
+    context = {"address": initialize_payment_instance.wallet_address, 
+               "customer": initialize_payment_instance.customers_email, 
+               "usd": initialize_payment_instance.amount, "xrp": initialize_payment_instance.xrp_amount, 
+               "business": initialize_payment_instance.business.business_name,
+               "eur": initialize_payment_instance.eur,
+               "jpy":initialize_payment_instance.jpy
+               }
+    return render(request, 'transactions/transactions.html', context)
 
 
 def custom_page_not_found(request, exception):

@@ -10,8 +10,8 @@
 		<div
 			class="flex flex-col justify-center items-center h-screen w-full bg-gray-200"
 		>
-			<div class="flex justify-center mx-auto items-center">
-				<p class="tracking-[6px] text-indigo-600 text-[20px] italic">
+			<div class="flex justify-center mx-auto items-center mb-4">
+				<p class="tracking-[6px] text-indigo-600 text-[35px] italic">
 					Ripple
 				</p>
 				<span class="italic tracking-[6px] text-red-700 text-[20px]"
@@ -22,26 +22,33 @@
 			<div
 				class="items-center mx-auto h-screen/2 w-[300px] bg-white shadow-lg rounded-lg py-2"
 			>
-				<div class="justify-between my-1 mx-4">
-					<p class="italic">XYZ Business</p>
+				<div class="flex justify-between">
+					<div class="justify-between my-1 mx-4">
+						<p class="italic">{{business}}</p>
+					</div>
+					<div class="justify-between my-1 mx-4">
+						<p class="italic text-[10px] font-semibold">
+							Customer: {{customer}}
+						</p>
+					</div>
 				</div>
 
 				<div
 					class="flex px-4 justify-center mx-auto my-2 bg-neutral-200"
 				>
 					<p class="text-[13px] mx-auto">
-						Please Ensure you verify payment after making transfer
-						from your wallet
+						You can make payment using xrp native token or one of these
+						currencies
 					</p>
 				</div>
 				<div class="flex flex-col px-4 justify-center mx-auto my-2">
 					<div class="flex justify-between">
-						<p class="text-[13px] font-light">NGN:14,000</p>
-						<p class="text-[13px] font-light">JPY: 4585</p>
+						<p class="text-[13px] font-semibold">XRP: {{xrp}}</p>
+						<p class="text-[13px] font-semibold">JPY: {{jpy}}</p>
 					</div>
 					<div class="flex justify-between">
-						<p class="text-[13px] font-light">USD: 300</p>
-						<p class="text-[13px] font-light">EUR: 256</p>
+						<p class="text-[13px] font-semibold">USD: {{usd}}</p>
+						<p class="text-[13px] font-semibold">EUR: {{eur}}</p>
 					</div>
 				</div>
 				<div class="flex flex-col justify-center mx-auto my-2">
@@ -50,7 +57,7 @@
 					</p>
 					<input
 						type="text"
-						value="rwDJ3sxq3eMZRrGgDKGQcV26JyfhAuky8b"
+						value="{{address}}"
 						disabled
 						class="mx-4 text-[12px] border border-s-purple-900"
 					/>
