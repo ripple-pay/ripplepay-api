@@ -11,7 +11,8 @@
   # Trustline Issuer
    * The Issuer us provided with the ability to add a few currency [EUR, JPY, NGN, USD] trustlines to customers xrp wallet addresses.
    * Add ISSUER=rg2MAgwqwmV9TgMexVBpRDK89vMyJkpbC to your .env file
-   * Also add your backend url to the .env file as BACKEND_DOMAIN=http://localhost:8000
+   * Add your backend url to the .env file as BACKEND_DOMAIN=http://localhost:8000
+   * Dont forget to add your project signing key to the .env file as SIGNING_KEY=""
 
 #Things to note when testing locally
 * Must have an internet connection
