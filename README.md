@@ -1,6 +1,6 @@
 # RipplePay-Description
-  * Ripplepay is a mutli-currency business to business solution that is built on xrp ledger.
-  * The API is written in python, django and django rest framework.
+  * Ripplepay is a mutli-currency cross-border business to business  payment solution that is built on the xrp ledger.
+  * This API is written using python, django and django rest framework.
 # Third Party API Services
   # Messari 
     * Messari was used in this project to get the current price of 1XRP token to 1USD
@@ -9,7 +9,7 @@
     * Signup on currency freak and get copy your api-key. Currency freak provided us with the forex exchange value of 1USD to 1EUR, 1USD to JPY and 1USD to 1NGN
     * Add CURRENCY_FREAK_API_KEY="api-key" your .env file.
   # Trustline Issuer
-   * The Issuer was provided with the ability to add a few currency [EUR, JPY, NGN, USD] trustlines to customers xrp wallet addresses.
+   * The Issuer us provided with the ability to add a few currency [EUR, JPY, NGN, USD] trustlines to customers xrp wallet addresses.
    * Add ISSUER=rg2MAgwqwmV9TgMexVBpRDK89vMyJkpbC to your .env file
    * Also add your backend url to the .env file as BACKEND_DOMAIN=http://localhost:8000
 
