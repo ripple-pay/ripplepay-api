@@ -33,13 +33,13 @@ async def api_request(options, websocket):
     try:
         await websocket.send(json.dumps(options))
         message = await websocket.recv()
-        print(message, "message")
+        
         return json.loads(message)
     except Exception as e:
         return e
 #Subscribe and listen wto when a payment is made to your wallet address
 async def do_subscribe(wallet_address, websocket):
-    print(wallet_address, "This is wallet")
+
     command = await api_request({
         'command': 'subscribe',
         'accounts': [str(wallet_address)]
@@ -54,10 +54,12 @@ async def do_subscribe(wallet_address, websocket):
         if(type(datum['transaction']['Amount']) != str):
             transaction_details = datum['transaction']['Amount']
             transaction_details['account'] = datum['transaction']['Account']
-            print("TRANSACTION_DETAILS", transaction_details)
+            
             
             funds_transfer_instance = await funds_transfer(wallet_address, transaction_details) #Transfer the funds from generated adddress to base address
         else:
+            transaction_details ={}
+            # transaction_details['account'] =  datum['transaction']['Account']
             funds_transfer_instance = await funds_transfer(wallet_address, "") #Transfer the funds from generated adddress to base address
     else:
         pass
@@ -71,7 +73,7 @@ async def run(wallet_address):
         #    await pingpong(websocket)
            await do_subscribe(wallet_address,websocket)
         except websockets.ConnectionClosed:
-            print('Disconnected...')
+            pass
             
 @sync_to_async
 def getPaymentInstance(text_data):
@@ -86,8 +88,6 @@ class ExternalWebSocketConsumer(AsyncWebsocketConsumer):
         await self.accept()
     async def receive(self, text_data=None, bytes_data=None):
         payment_instance_wallet = await getPaymentInstance(text_data)
-    
-        print(payment_instance_wallet, "Wallet address")
         await run(payment_instance_wallet) #Pass the wallet of the payment Instance to the run function()
        
     

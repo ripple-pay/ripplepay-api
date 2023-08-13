@@ -48,8 +48,6 @@ class LoginView(APIView):
             serializer = self.serializer_class(user, context= {'request': request})
             return Response(data ={"data":serializer.data,"refresh": str(refresh), "access": raw_token}, status=status.HTTP_200_OK)
         except Exception as e:
-            print(e, "+====================")
-            # logger.info(f"Error occured during log in, {e}")
             return Response(data={"message": "Failure occurred during log in"}, status=status.HTTP_400_BAD_REQUEST)
         
 
@@ -63,11 +61,15 @@ class RegisterBusiness(APIView):
         data = request.data
         business_id = businessIDGenerator()
         api_key = apiKeyGenerator()
+        currencies = ["EUR", "USD", "JPY", "NGN"]
         try:
             #Make all fields required in the frontend 
             serializer = self.serializer_class(data=data)
             if serializer.is_valid():
                 wallet = generate_faucet_wallet(xrp_client, debug=True)
+                #add trustlines to created wallets 
+                for currency in currencies:
+                    trustline_reply = create_trust_line(private_key=wallet.private_key,public_key=wallet.public_key, seed=seed,issuer=os.getenv('ISSUER'),currency= currency,amount= 1000000000) # amount is  1 *10**9
               
                 user = serializer.save()  
                 user.set_password(data['password'])
@@ -77,20 +79,19 @@ class RegisterBusiness(APIView):
                 user.public_key = wallet.public_key
                 user.api_key = api_key
                 user.api_key_expiration = three_months
+                user.account_activated = True
                 user.save()   
-                # serialized_data = self.serializer_class(saved_user)
                 
                 return Response(data=serializer.data, status= status.HTTP_201_CREATED)
             return Response(data=serializer.errors, status= status.HTTP_400_BAD_REQUEST)  
         except Exception as e:
-            print(e,"+++++++++++++++")
-            # logging.info(f"Error occured during signup : {e}")
             return Response(data={"message": "Error occured during signup"}, status=status.HTTP_400_BAD_REQUEST)
           
         
 business = RegisterBusiness.as_view()
 
 class GetBalanceAndCustomersCountAPIView(APIView):
+    #Get account and all the trustlines balances associated with the base address
         permission_classes = [IsAuthenticated]
         def get(self,request):
             data ={}
@@ -98,11 +99,7 @@ class GetBalanceAndCustomersCountAPIView(APIView):
                 user = User.objects.get(email=request.user)
                 balance = get_balance(address=user.classic_address, client=xrp_client, ledger_index="validated")
                 account_lines_request = AccountLines(account=user.classic_address)
-
-                # Send the request to the XRP Ledger
                 response = xrp_client.request(account_lines_request)
-
-                # Extract and display the trustlines
                 trustlines = response.result["lines"]
                 for trustline in trustlines:
                     if trustline['currency'] == "JPY":
@@ -117,11 +114,8 @@ class GetBalanceAndCustomersCountAPIView(APIView):
                 # customers = TransactionsModel.objects.distinct('customers_email').count() // Worrks for postgresql db not mysql
                 
                 data['balance'] = balance
-                # data['customer_count'] = customers
-                print("data:::::::::::::", data)
                 return Response(data={"message":"success", "data": data}, status=status.HTTP_200_OK)
             except Exception as e:
-                print(e, "EEEEEEEEEEEEE")
                 return Response(data={"message":"failed", "data": "Failed process"}, status=status.HTTP_400_BAD_REQUEST)
 
 balance_customer_count = GetBalanceAndCustomersCountAPIView.as_view()
@@ -136,12 +130,10 @@ class ActivateAccount(APIView):
         try:
             for currency in currencies:
                 trustline_reply = create_trust_line(private_key=account.private_key,public_key=account.public_key, seed=seed,issuer=os.getenv('ISSUER'),currency= currency,amount= 1000000000) # amount is  1 *10**9
-            print(trustline_reply)
             account.account_activated = True
             account.save()
             return Response({}, status=status.HTTP_200_OK)
         except Exception as e:
-            print(e, "Account activation error")
             return Response({"Error": {e}}, status=status.HTTP_400_BAD_REQUEST)
 
 activate_account = ActivateAccount.as_view()

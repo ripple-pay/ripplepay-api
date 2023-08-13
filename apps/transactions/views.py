@@ -63,7 +63,8 @@ class InitializePaymentViewSet(APIView):
                     customers_email = data['customers_email'],
                     xrp_amount = xrp_amount,
                     eur = round(eur_jpy_response['EUR'], 2),
-                    jpy = round(eur_jpy_response['JPY'],2)
+                    jpy = round(eur_jpy_response['JPY'],2),
+                    ngn = round(eur_jpy_response['NGN'],2)
                     ) 
         
                 serializer = self.serializer_class(transaction_model)
@@ -129,9 +130,7 @@ class TransactionsView(APIView):
 
 transactions = TransactionsView.as_view()
             
-    
-                
-
+        
 def transactionsview(request, ref):
     initialize_payment_instance = InitializePaymentModel.objects.filter(transaction_reference=ref).first()
     context = {"address": initialize_payment_instance.wallet_address, 
@@ -139,7 +138,8 @@ def transactionsview(request, ref):
                "usd": initialize_payment_instance.amount, "xrp": initialize_payment_instance.xrp_amount, 
                "business": initialize_payment_instance.business.business_name,
                "eur": initialize_payment_instance.eur,
-               "jpy":initialize_payment_instance.jpy
+               "jpy":initialize_payment_instance.jpy,
+               "ngn": initialize_payment_instance.ngn
                }
     return render(request, 'transactions/transactions.html', context)
 

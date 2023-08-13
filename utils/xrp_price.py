@@ -24,4 +24,5 @@ def get_usd_eur(usd_amount):
     body = res.json()
     eur = float(usd_amount) * float(body["rates"]["EUR"])
     jpy = float(usd_amount)* float(body["rates"]["JPY"])
-    return {"EUR":eur, "JPY": jpy}
+    ngn = float(usd_amount)* float(body["rates"]["NGN"])
+    return {"EUR":eur, "JPY": jpy, "NGN": ngn}

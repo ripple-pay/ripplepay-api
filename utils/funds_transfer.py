@@ -44,15 +44,10 @@ def funds_transfer(address, transaction_details):
                         
                     
             except (Exception) as e:
-                print(e, "Error")
+                # print(e, "Error")
                 exit(f"Submit failed: {e}")
         else:
-    #          amount={
-    #     "currency": issued_currency_code,
-    #     "issuer": issued_currency_issuer,
-    #     "value": amount_to_send,
-    # }
-            #Transfer issued currency
+ 
             try:
                 send_token_tx = Payment(
                     account=paymentInstance.wallet_address,
@@ -67,11 +62,9 @@ def funds_transfer(address, transaction_details):
                 # print(f"Sending {issue_quantity} {currency_code} to {hot_wallet.address}...")
                 print("Sending issued currency")
                 signed_tx = autofill_and_sign(send_token_tx, xrp_client, wallet)
-                print(signed_tx, "SIGNED TX:::::::::::::::::::::::::::::::")
+                print("SIGNED TX:::::::::::::::::::::::::::::::")
                 tx_response = submit(signed_tx, xrp_client)
-                # response = xrpl.transaction.submit_and_wait(send_token_tx, xrp_client, wallet)
-                print(tx_response, "RESPONSE::::::::::::::::::::::::::")
-                # print(response)
+             
                 if tx_response.result["accepted"] == True:
                     print("SENT ISSUED CURRENCY")
                     TransactionsModel.objects.create(wallet_address = paymentInstance.wallet_address, business = business, amount = paymentInstance.amount, transaction_reference = paymentInstance.transaction_reference, xrp_amount = transaction_details['value'], customers_email = paymentInstance.customers_email, currency = transaction_details['currency'] )
@@ -79,7 +72,7 @@ def funds_transfer(address, transaction_details):
                 pass
         
     except Exception as e:
-        print(e, "Error 2")
+        # print(e, "Funds transfer Error")
         pass
     
 

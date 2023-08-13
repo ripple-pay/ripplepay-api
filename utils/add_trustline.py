@@ -21,9 +21,7 @@ def create_trust_line(private_key, public_key, seed, issuer, currency, amount):
 )
     
     try:
-        print("Creating trust line from hot address to issuer...")
         response = xrpl.transaction.submit_and_wait(trustline_tx, client, receiving_wallet)
-        print(response)
         return response
     except xrpl.transaction.XRPLReliableSubmissionException as e:
         reply = f"Submit failed: {e}"
