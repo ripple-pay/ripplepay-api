@@ -1,6 +1,6 @@
 # RipplePay-Description
   * Ripplepay is a mutli-currency business to business solution that is built on xrp ledger.
-  * The API is written in python programming language.
+  * The API is written in python, django and django rest framework.
 # Third Party API Services
   # Messari 
     * Messari was used in this project to get the current price of 1XRP token to 1USD
@@ -11,6 +11,10 @@
   # Trustline Issuer
    * The Issuer was provided with the ability to add a few currency [EUR, JPY, NGN, USD] trustlines to customers xrp wallet addresses.
    * Add ISSUER=rg2MAgwqwmV9TgMexVBpRDK89vMyJkpbC to your .env file
+   * Also add your backend url to the .env file as BACKEND_DOMAIN=http://localhost:8000
 
-
+#Things to note when testing locally
+* Must have an internet connection
+* Start your django server
+* Start your redis server using "redis-server" as cmd.
   
