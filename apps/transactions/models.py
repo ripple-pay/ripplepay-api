@@ -13,10 +13,15 @@ class InitializePaymentModel(TimeStampedUUIDModel):
     amount = models.CharField(max_length=255, blank=True, null=True)
     transaction_reference = models.CharField(max_length=255, blank=True, null=True)
     xrp_amount = models.CharField(max_length=255, blank=True, null=True)
+    customers_email = models.CharField(max_length=155, blank=True, null=True)
     status = models.BooleanField(default=False)
+    eur = models.CharField(max_length=255, blank=True, null=True)
+    jpy = models.CharField(max_length=255, blank=True, null=True)
+    ngn = models.CharField(max_length=255, blank=True, null=True)
+    
     
     def __str__(self):
-        return f"{self.business.email} || {self.amount} "
+        return f"{self.customers_email} || {self.amount} "
     
 
 class TransactionsModel(TimeStampedUUIDModel):
@@ -25,6 +30,17 @@ class TransactionsModel(TimeStampedUUIDModel):
     amount = models.CharField(max_length=255, blank=True, null=True)
     transaction_reference = models.CharField(max_length=255, blank=True, null=True)
     xrp_amount = models.CharField(max_length=255, blank=True, null=True)
+    currency = models.CharField(max_length=255, blank=True, null=True)
+    customers_email = models.CharField(max_length=155, blank=True, null=True)
+    customers_address = models.CharField(max_length=155, blank=True, null=True)
+    def __str__(self):
+        return f"{self.business.email} || {self.amount} "
+
+class WithdrawalModel(TimeStampedUUIDModel):
+    address = models.CharField(max_length=255, blank=True, null=True)
+    business = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    amount = models.CharField(max_length=255, blank=True, null=True)
+    currency = models.CharField(max_length=10, blank=True, null=True)
     def __str__(self):
         return f"{self.business.email} || {self.amount} "
     

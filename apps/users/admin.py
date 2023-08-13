@@ -49,7 +49,8 @@ class UserAdmin(BaseUserAdmin):
                     "business_name",
                     "classic_address",
                     "business_id",
-                    "phone_number"
+                    "phone_number",
+                    "api_key"
                   
                     
                 )
