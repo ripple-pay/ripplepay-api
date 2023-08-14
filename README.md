@@ -14,12 +14,12 @@
    * Add your backend url to the .env file as BACKEND_DOMAIN=http://localhost:8000
    * Dont forget to add your project signing key to the .env file as SIGNING_KEY=""
 
-#Things to note when testing locally
+# Things to note when testing locally
 * Must have an internet connection
 * Start your django server
 * Start your redis server using "redis-server" as cmd.
   
-#How to generate payment link for customers on testnet
+# How to generate payment link for customers on testnet
 * Endpoint: http://localhost:8000/transactions/initialize-payment
 * Request body: {"amount":10, "transaction_reference":"abcde", "customers_email":"customer@gmail.com", 
    "redirect_url":"wwww.google.com"}
