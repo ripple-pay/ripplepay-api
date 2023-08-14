@@ -19,3 +19,10 @@
 * Start your django server
 * Start your redis server using "redis-server" as cmd.
   
+#How to generate payment link for customers on testnet
+* Endpoint: http://localhost:8000/transactions/initialize-payment
+* Request body: {"amount":10, "transaction_reference":"abcde", "customers_email":"customer@gmail.com", 
+   "redirect_url":"wwww.google.com"}
+* Add your business api-key to the request header as a key pair-value. {"api-key": "value"}
+* Your request method should be a post request.
+  
